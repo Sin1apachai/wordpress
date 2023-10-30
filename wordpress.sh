@@ -25,9 +25,13 @@ if [ "$count" -gt 1 ]; then
     setsebool -P domain_can_mmap_files on
     setsebool -P httpd_unified on
 else
-    dnf install wget
-    dnf -y install php
+    dnf update
+    dnf -y install php wget mysql mysql-server
+    systemctl enable mysqld
+    systemctl start mysqld
+    systemctl enable httpd
     systemctl restart httpd
+    systemctl enable php-fpm
     systemctl status php-fpm
     dnf -y install php-pear php-mbstring php-pdo php-gd php-mysqlnd php-enchant enchant hunspell
     echo "php_value[max_execution_time] = 600
@@ -38,12 +42,6 @@ else
     php_value[max_input_vars] = 2000
     php_value[date.timezone] = Asia/Bangkok" | tee -a /etc/php-fpm.d/www.conf
     systemctl restart php-fpm
-    mysql -u root -p -e "CREATE DATABASE $user_db;"
-    mysql -u root -p -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
-    mysql -u root -p -e "flush privileges;"
-    wget https://wordpress.org/latest.tar.gz /var/www/
-    tar zxvf wordpress.tar.gz -C /var/www/
-    mv wordpress /var/www/$project_name
     chown -R apache. /var/www/$project_name
     echo "
     Timeout 600
@@ -60,4 +58,10 @@ else
     setsebool -P httpd_can_network_connect on
     setsebool -P domain_can_mmap_files on
     setsebool -P httpd_unified on
+    mysql -u root -p -e "CREATE DATABASE $user_db;"
+    mysql -u root -p -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
+    mysql -u root -p -e "flush privileges;"
+    wget https://wordpress.org/latest.tar.gz /var/www/
+    tar zxvf wordpress.tar.gz -C /var/www/
+    mv wordpress /var/www/$project_name
 fi
