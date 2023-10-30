@@ -6,6 +6,7 @@ password_db="$2"
 count=$(find /var/www/ -type d -mindepth 1 | wc -l)
 if [ -n "$user_db" ] && [ -n "$password_db" ]; then
     if [ "$count" -gt 1 ]; then
+        tar zxvf /var/www/latest.tar.gz -C /var/www/
         mv /var/www/wordpress /var/www/$user_db
         chown -R apache. /var/www/$user_db
         mysql -u root -e "CREATE DATABASE $user_db;"
