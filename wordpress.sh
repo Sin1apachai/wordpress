@@ -12,15 +12,15 @@ if [ -n "$user_db" ] && [ -n "$password_db" ]; then
         mysql -u root -p -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
         mysql -u root -p -e "flush privileges;"
         echo "
-    Timeout 600
-    ProxyTimeout 600
-    Alias /$user_db \"/var/www/$user_db/\"
-    DirectoryIndex index.php index.html index.htm
-    <Directory \"/var/www/$user_db\">
-        Options FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>" | tee -a "/etc/httpd/conf.d/$user_db.conf"
+Timeout 600
+ProxyTimeout 600
+Alias /$user_db \"/var/www/$user_db/\"
+DirectoryIndex index.php index.html index.htm
+<Directory \"/var/www/$user_db\">
+    Options FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>" | tee -a "/etc/httpd/conf.d/$user_db.conf"
         systemctl reload httpd
         setsebool -P httpd_can_network_connect on
         setsebool -P domain_can_mmap_files on
@@ -37,24 +37,24 @@ if [ -n "$user_db" ] && [ -n "$password_db" ]; then
         systemctl status php-fpm
         dnf -y install php-pear php-mbstring php-pdo php-gd php-mysqlnd php-enchant enchant hunspell
         echo "
-    php_value[max_execution_time] = 600
-    php_value[memory_limit] = 2G
-    php_value[post_max_size] = 2G
-    php_value[upload_max_filesize] = 2G
-    php_value[max_input_time] = 600
-    php_value[max_input_vars] = 2000
-    php_value[date.timezone] = Asia/Bangkok" | tee -a /etc/php-fpm.d/www.conf
+php_value[max_execution_time] = 600
+php_value[memory_limit] = 2G
+php_value[post_max_size] = 2G
+php_value[upload_max_filesize] = 2G
+php_value[max_input_time] = 600
+php_value[max_input_vars] = 2000
+php_value[date.timezone] = Asia/Bangkok" | tee -a /etc/php-fpm.d/www.conf
         systemctl restart php-fpm
         echo "
-    Timeout 600
-    ProxyTimeout 600
-    Alias /$user_db \"/var/www/$user_db/\"
-    DirectoryIndex index.php index.html index.htm
-    <Directory \"/var/www/$user_db\">
-        Options FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>\n" | tee -a "/etc/httpd/conf.d/$user_db.conf"
+Timeout 600
+ProxyTimeout 600
+Alias /$user_db \"/var/www/$user_db/\"
+DirectoryIndex index.php index.html index.htm
+<Directory \"/var/www/$user_db\">
+    Options FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>\n" | tee -a "/etc/httpd/conf.d/$user_db.conf"
         systemctl restart httpd
         setsebool -P httpd_can_network_connect on
         setsebool -P domain_can_mmap_files on
