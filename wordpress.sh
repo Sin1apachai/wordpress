@@ -11,16 +11,16 @@ if [ -n "$user_db" ] && [ -n "$password_db" ]; then
         mysql -u root -p -e "CREATE DATABASE $user_db;"
         mysql -u root -p -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
         mysql -u root -p -e "flush privileges;"
-        echo "\n
-    Timeout 600\n
-    ProxyTimeout 600\n
-    Alias /$user_db \"/var/www/$user_db/\"\n
-    DirectoryIndex index.php index.html index.htm\n
-    <Directory \"/var/www/$user_db\">\n
-        Options FollowSymLinks\n
-        AllowOverride All\n
-        Require all granted\n
-    </Directory>\n" | tee -a "/etc/httpd/conf.d/$user_db.conf"
+        echo "
+    Timeout 600
+    ProxyTimeout 600
+    Alias /$user_db \"/var/www/$user_db/\"
+    DirectoryIndex index.php index.html index.htm
+    <Directory \"/var/www/$user_db\">
+        Options FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>" | tee -a "/etc/httpd/conf.d/$user_db.conf"
         systemctl reload httpd
         setsebool -P httpd_can_network_connect on
         setsebool -P domain_can_mmap_files on
@@ -36,24 +36,24 @@ if [ -n "$user_db" ] && [ -n "$password_db" ]; then
         systemctl enable php-fpm
         systemctl status php-fpm
         dnf -y install php-pear php-mbstring php-pdo php-gd php-mysqlnd php-enchant enchant hunspell
-        echo "\n
-    php_value[max_execution_time] = 600\n
-    php_value[memory_limit] = 2G\n
-    php_value[post_max_size] = 2G\n
-    php_value[upload_max_filesize] = 2G\n
-    php_value[max_input_time] = 600\n
-    php_value[max_input_vars] = 2000\n
+        echo "
+    php_value[max_execution_time] = 600
+    php_value[memory_limit] = 2G
+    php_value[post_max_size] = 2G
+    php_value[upload_max_filesize] = 2G
+    php_value[max_input_time] = 600
+    php_value[max_input_vars] = 2000
     php_value[date.timezone] = Asia/Bangkok" | tee -a /etc/php-fpm.d/www.conf
         systemctl restart php-fpm
-        echo "\n
-    Timeout 600\n
-    ProxyTimeout 600\n
-    Alias /$user_db \"/var/www/$user_db/\"\n
-    DirectoryIndex index.php index.html index.htm\n
-    <Directory \"/var/www/$user_db\">\n
-        Options FollowSymLinks\n
-        AllowOverride All\n
-        Require all granted\n
+        echo "
+    Timeout 600
+    ProxyTimeout 600
+    Alias /$user_db \"/var/www/$user_db/\"
+    DirectoryIndex index.php index.html index.htm
+    <Directory \"/var/www/$user_db\">
+        Options FollowSymLinks
+        AllowOverride All
+        Require all granted
     </Directory>\n" | tee -a "/etc/httpd/conf.d/$user_db.conf"
         systemctl restart httpd
         setsebool -P httpd_can_network_connect on
