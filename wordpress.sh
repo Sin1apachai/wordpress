@@ -67,4 +67,4 @@ if [ -n "$project_name" ] && [ -n "$user_db" ] && [ -n "$db" ]: then
     fi
 else
     echo("Please settings Params")
-if
+fi
