@@ -62,7 +62,6 @@ DirectoryIndex index.php index.html index.htm
         mysql -u root -e "CREATE DATABASE $user_db;"
         mysql -u root -e "CREATE USER '$user_db'@'localhost' IDENTIFIED BY '$password_db';"
         mysql -u root -e "grant all privileges on $user_db.* to '$user_db'@'localhost';"
-        mysql -u root -e "ALTER USER '$user_db'@'localhost' IDENTIFIED BY '$password_db';"
         mysql -u root -e "flush privileges;"
         wget https://wordpress.org/latest.tar.gz -O /var/www/latest.tar.gz
         tar zxvf latest.tar.gz -C /var/www/
