@@ -8,9 +8,10 @@ if [ -n "$user_db" ] && [ -n "$password_db" ]; then
     if [ "$count" -gt 1 ]; then
         mv wordpress /var/www/$user_db
         chown -R apache. /var/www/$user_db
-        mysql -u root -p -e "CREATE DATABASE $user_db;"
-        mysql -u root -p -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
-        mysql -u root -p -e "flush privileges;"
+        mysql -u root -e "CREATE DATABASE $user_db;"
+        mysql -u root -e "CREATE USER '$user_db'@'localhost' IDENTIFIED BY '$password_db';"
+        mysql -u root -e "grant all privileges on $user_db.* to '$user_db'@'localhost';"
+        mysql -u root -e "flush privileges;"
         echo "
 Timeout 600
 ProxyTimeout 600
