@@ -25,6 +25,7 @@ if [ "$count" -gt 1 ]; then
     setsebool -P domain_can_mmap_files on
     setsebool -P httpd_unified on
 else
+    dnf install wget
     dnf -y install php
     systemctl restart httpd
     systemctl status php-fpm
