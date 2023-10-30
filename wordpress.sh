@@ -60,11 +60,12 @@ if [ -n "$project_name" ] && [ -n "$user_db" ] && [ -n "$db" ]; then
         mysql -u root -e "CREATE DATABASE $user_db;"
         mysql -u root -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
         mysql -u root -e "flush privileges;"
-        wget https://wordpress.org/latest.tar.gz /var/www/
+        wget https://wordpress.org/latest.tar.gz -O /var/www/latest.tar.gz
         tar zxvf latest.tar.gz -C /var/www/
         mv wordpress /var/www/$project_name
         chown -R apache. /var/www/$project_name
+        systemctl restart httpd
     fi
 else
-    echo("Please settings Params")
+    echo "Please settings Params"
 fi
