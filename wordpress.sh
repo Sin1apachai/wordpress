@@ -5,63 +5,66 @@ password_db="$2"
 project_name="$3"
 
 count=$(find /var/www/ -type d -mindepth 1 | wc -l)
-if [ "$count" -gt 1 ]; then
-    mv wordpress /var/www/$project_name
-    chown -R apache. /var/www/$project_name
-    mysql -u root -p -e "CREATE DATABASE $user_db;"
-    mysql -u root -p -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
-    mysql -u root -p -e "flush privileges;"
-    chown -R apache. /var/www/$project_name
-    echo "
-    Alias /$project_name \"/var/www/$project_name/\"
-    DirectoryIndex index.php index.html index.htm
-    <Directory \"/var/www/$project_name\">
-        Options FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>" | tee -a /etc/php-fpm.d/www.conf
-    systemctl reload httpd
-    setsebool -P httpd_can_network_connect on
-    setsebool -P domain_can_mmap_files on
-    setsebool -P httpd_unified on
-else
-    dnf update
-    dnf -y install php wget mysql mysql-server
-    systemctl enable mysqld
-    systemctl start mysqld
-    systemctl enable httpd
-    systemctl restart httpd
-    systemctl enable php-fpm
-    systemctl status php-fpm
-    dnf -y install php-pear php-mbstring php-pdo php-gd php-mysqlnd php-enchant enchant hunspell
-    echo "php_value[max_execution_time] = 600
-    php_value[memory_limit] = 2G
-    php_value[post_max_size] = 2G
-    php_value[upload_max_filesize] = 2G
-    php_value[max_input_time] = 600
-    php_value[max_input_vars] = 2000
+if [ -n "$project_name" ] && [ -n "$user_db" ] && [ -n "$db" ]: then
+    if [ "$count" -gt 1 ]; then
+        mv wordpress /var/www/$project_name
+        chown -R apache. /var/www/$project_name
+        mysql -u root -p -e "CREATE DATABASE $user_db;"
+        mysql -u root -p -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
+        mysql -u root -p -e "flush privileges;"
+        echo "
+        Alias /$project_name \"/var/www/$project_name/\"
+        DirectoryIndex index.php index.html index.htm
+        <Directory \"/var/www/$project_name\">
+            Options FollowSymLinks
+            AllowOverride All
+            Require all granted
+        </Directory>" | tee -a /etc/php-fpm.d/www.conf
+        systemctl reload httpd
+        setsebool -P httpd_can_network_connect on
+        setsebool -P domain_can_mmap_files on
+        setsebool -P httpd_unified on
+    else
+        dnf -y update
+        dnf -y install php wget mysql mysql-server
+        systemctl enable mysqld
+        systemctl start mysqld
+        systemctl enable httpd
+        systemctl restart httpd
+        systemctl enable php-fpm
+        systemctl status php-fpm
+        dnf -y install php-pear php-mbstring php-pdo php-gd php-mysqlnd php-enchant enchant hunspell
+        echo "\n
+    php_value[max_execution_time] = 600\n
+    php_value[memory_limit] = 2G\n
+    php_value[post_max_size] = 2G\n
+    php_value[upload_max_filesize] = 2G\n
+    php_value[max_input_time] = 600\n
+    php_value[max_input_vars] = 2000\n
     php_value[date.timezone] = Asia/Bangkok" | tee -a /etc/php-fpm.d/www.conf
-    systemctl restart php-fpm
-    chown -R apache. /var/www/$project_name
-    echo "
-    Timeout 600
-    ProxyTimeout 600
-    
-    Alias /$project_name \"/var/www/$project_name/\"
-    DirectoryIndex index.php index.html index.htm
-    <Directory \"/var/www/$project_name\">
-        Options FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>" | tee -a /etc/php-fpm.d/www.conf
-    systemctl reload httpd
-    setsebool -P httpd_can_network_connect on
-    setsebool -P domain_can_mmap_files on
-    setsebool -P httpd_unified on
-    mysql -u root -p -e "CREATE DATABASE $user_db;"
-    mysql -u root -p -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
-    mysql -u root -p -e "flush privileges;"
-    wget https://wordpress.org/latest.tar.gz /var/www/
-    tar zxvf wordpress.tar.gz -C /var/www/
-    mv wordpress /var/www/$project_name
-fi
+        systemctl restart php-fpm
+        echo "\n
+    Timeout 600\n
+    ProxyTimeout 600\n
+    Alias /$project_name \"/var/www/$project_name/\"\n
+    DirectoryIndex index.php index.html index.htm\n
+    <Directory \"/var/www/$project_name\">\n
+        Options FollowSymLinks\n
+        AllowOverride All\n
+        Require all granted\n
+    </Directory>\n" | tee -a "/etc/httpd/conf.d/$project_name.conf"
+        systemctl restart httpd
+        setsebool -P httpd_can_network_connect on
+        setsebool -P domain_can_mmap_files on
+        setsebool -P httpd_unified on
+        mysql -u root -e "CREATE DATABASE $user_db;"
+        mysql -u root -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
+        mysql -u root -e "flush privileges;"
+        wget https://wordpress.org/latest.tar.gz /var/www/
+        tar zxvf latest.tar.gz -C /var/www/
+        mv wordpress /var/www/$project_name
+        chown -R apache. /var/www/$project_name
+    fi
+else
+    echo("Please settings Params")
+if
