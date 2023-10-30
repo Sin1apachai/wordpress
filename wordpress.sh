@@ -12,18 +12,21 @@ if [ -n "$project_name" ] && [ -n "$user_db" ] && [ -n "$db" ]; then
         mysql -u root -p -e "CREATE DATABASE $user_db;"
         mysql -u root -p -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
         mysql -u root -p -e "flush privileges;"
-        echo "
-        Alias /$project_name \"/var/www/$project_name/\"
-        DirectoryIndex index.php index.html index.htm
-        <Directory \"/var/www/$project_name\">
-            Options FollowSymLinks
-            AllowOverride All
-            Require all granted
-        </Directory>" | tee -a /etc/php-fpm.d/www.conf
+        echo "\n
+    Timeout 600\n
+    ProxyTimeout 600\n
+    Alias /$project_name \"/var/www/$project_name/\"\n
+    DirectoryIndex index.php index.html index.htm\n
+    <Directory \"/var/www/$project_name\">\n
+        Options FollowSymLinks\n
+        AllowOverride All\n
+        Require all granted\n
+    </Directory>\n" | tee -a "/etc/httpd/conf.d/$project_name.conf"
         systemctl reload httpd
         setsebool -P httpd_can_network_connect on
         setsebool -P domain_can_mmap_files on
         setsebool -P httpd_unified on
+        systemctl restart httpd
     else
         dnf -y update
         dnf -y install php wget mysql mysql-server
