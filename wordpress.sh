@@ -54,7 +54,7 @@ DirectoryIndex index.php index.html index.htm
     Options FollowSymLinks
     AllowOverride All
     Require all granted
-</Directory>\n" | tee -a "/etc/httpd/conf.d/$user_db.conf"
+</Directory>" | tee -a "/etc/httpd/conf.d/$user_db.conf"
         systemctl restart httpd
         setsebool -P httpd_can_network_connect on
         setsebool -P domain_can_mmap_files on
