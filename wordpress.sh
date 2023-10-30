@@ -6,7 +6,7 @@ password_db="$2"
 count=$(find /var/www/ -type d -mindepth 1 | wc -l)
 if [ -n "$user_db" ] && [ -n "$password_db" ]; then
     if [ "$count" -gt 1 ]; then
-        mv wordpress /var/www/$user_db
+        mv /var/www/wordpress /var/www/$user_db
         chown -R apache. /var/www/$user_db
         mysql -u root -e "CREATE DATABASE $user_db;"
         mysql -u root -e "CREATE USER '$user_db'@'localhost' IDENTIFIED BY '$password_db';"
@@ -65,8 +65,8 @@ DirectoryIndex index.php index.html index.htm
         mysql -u root -e "grant all privileges on $user_db.* to '$user_db'@'localhost';"
         mysql -u root -e "flush privileges;"
         wget https://wordpress.org/latest.tar.gz -O /var/www/latest.tar.gz
-        tar zxvf latest.tar.gz -C /var/www/
-        mv wordpress /var/www/$user_db
+        tar zxvf /var/www/latest.tar.gz -C /var/www/
+        mv /var/www/wordpress /var/www/$user_db
         chown -R apache. /var/www/$user_db
         systemctl restart httpd
     fi
