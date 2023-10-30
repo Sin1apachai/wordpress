@@ -2,26 +2,25 @@
 # CentOS9 install wordpress x Apache
 user_db="$1"
 password_db="$2"
-project_name="$3"
 
 count=$(find /var/www/ -type d -mindepth 1 | wc -l)
-if [ -n "$project_name" ] && [ -n "$user_db" ] && [ -n "$db" ]; then
+if [ -n "$user_db" ] && [ -n "$db" ]; then
     if [ "$count" -gt 1 ]; then
-        mv wordpress /var/www/$project_name
-        chown -R apache. /var/www/$project_name
+        mv wordpress /var/www/$user_db
+        chown -R apache. /var/www/$user_db
         mysql -u root -p -e "CREATE DATABASE $user_db;"
         mysql -u root -p -e "grant all privileges on $user_db.* to '$user_db'@'localhost' identified by '$password_db';"
         mysql -u root -p -e "flush privileges;"
         echo "\n
     Timeout 600\n
     ProxyTimeout 600\n
-    Alias /$project_name \"/var/www/$project_name/\"\n
+    Alias /$user_db \"/var/www/$user_db/\"\n
     DirectoryIndex index.php index.html index.htm\n
-    <Directory \"/var/www/$project_name\">\n
+    <Directory \"/var/www/$user_db\">\n
         Options FollowSymLinks\n
         AllowOverride All\n
         Require all granted\n
-    </Directory>\n" | tee -a "/etc/httpd/conf.d/$project_name.conf"
+    </Directory>\n" | tee -a "/etc/httpd/conf.d/$user_db.conf"
         systemctl reload httpd
         setsebool -P httpd_can_network_connect on
         setsebool -P domain_can_mmap_files on
@@ -49,13 +48,13 @@ if [ -n "$project_name" ] && [ -n "$user_db" ] && [ -n "$db" ]; then
         echo "\n
     Timeout 600\n
     ProxyTimeout 600\n
-    Alias /$project_name \"/var/www/$project_name/\"\n
+    Alias /$user_db \"/var/www/$user_db/\"\n
     DirectoryIndex index.php index.html index.htm\n
-    <Directory \"/var/www/$project_name\">\n
+    <Directory \"/var/www/$user_db\">\n
         Options FollowSymLinks\n
         AllowOverride All\n
         Require all granted\n
-    </Directory>\n" | tee -a "/etc/httpd/conf.d/$project_name.conf"
+    </Directory>\n" | tee -a "/etc/httpd/conf.d/$user_db.conf"
         systemctl restart httpd
         setsebool -P httpd_can_network_connect on
         setsebool -P domain_can_mmap_files on
@@ -65,8 +64,8 @@ if [ -n "$project_name" ] && [ -n "$user_db" ] && [ -n "$db" ]; then
         mysql -u root -e "flush privileges;"
         wget https://wordpress.org/latest.tar.gz -O /var/www/latest.tar.gz
         tar zxvf latest.tar.gz -C /var/www/
-        mv wordpress /var/www/$project_name
-        chown -R apache. /var/www/$project_name
+        mv wordpress /var/www/$user_db
+        chown -R apache. /var/www/$user_db
         systemctl restart httpd
     fi
 else
