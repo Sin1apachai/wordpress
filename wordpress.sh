@@ -4,7 +4,7 @@ user_db="$1"
 password_db="$2"
 
 count=$(find /var/www/ -type d -mindepth 1 | wc -l)
-if [ -n "$user_db" ] && [ -n "$db" ]; then
+if [ -n "$user_db" ] && [ -n "$password_db" ]; then
     if [ "$count" -gt 1 ]; then
         mv wordpress /var/www/$user_db
         chown -R apache. /var/www/$user_db
